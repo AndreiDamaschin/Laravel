@@ -20,6 +20,7 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/guestBook', 'GuestBookController@index')->name('guestBook');
 Route::any('text', 'GuestBookController@text')->name('text');
+Route::any('download', 'GuestBookController@download')->name('download');
 
 
 

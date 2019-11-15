@@ -7,7 +7,7 @@ use Carbon\Carbon;
 class GuestBook extends Model
 {
     protected $table = 'guestBook';
-    protected $fillable = ['email', 'text', 'attach'];
+    protected $fillable = ['email', 'text', 'attach', 'mess'];
     public function getCreatedAtAttribute($date)
     {
         return Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('H:i:s / d.m.Y');

@@ -79,7 +79,8 @@
             </div>
         </nav>
         <div class="card-body">
-            <form id = "message" action = "#">
+            <form id = "message">
+            @csrf
                <div class="form-group row">
                     <label for="attach" class="col-md-4 col-form-label text-md-right">{{ __('Attach file') }}</label>
 
@@ -91,7 +92,7 @@
                     <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
 
                     <div class="col-md-6">
-                        <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">
+                        <input id="email" type="email" placeholder = "Email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">
 
                         @error('email')
                             <span class="invalid-feedback" role="alert">
@@ -116,6 +117,7 @@
                 </div>
             </form>
         </div>
+
         @yield('content')
     </div>
 <script type = "text/javascript">
@@ -127,17 +129,38 @@ $.ajaxSetup({
 $("#message").click(function(){
     $('#text').val($('#text').val().length > 1000 ? $('#text').val().substring(0, 999) : $('#text').val());
 });
+$('#attach').change(function(){
+    if(!$(this)[0].files[0].type.includes('image') && $(this)[0].files[0].size > 100000)
+    {
+        $('#attach').val('');
+        alert("File must be not bigger than 100kb !")
+    }
+});
 $("#message").submit(function(){
+    var form = new FormData($(this)[0]);
     $.ajax({
         type : "POST",
-        url : '{{ route("text") }}',
-        dataType : 'JSON',
-        data : {email:$('#email').val(), text:$('#text').val(), attach:$('#attach').val()},
-        success : function(data){
-          console.log(data);
-        }
+        url : 'text',
+        data : form,
+        processData: false,
+        contentType: false
       });
-    });
+});
+function download(path){
+    var form = new FormData();
+    form.append('path', path);
+    $.ajax({
+        type : "POST",
+        url : 'download',
+        data : form,
+        processData: false,
+        contentType: false
+      });
+}
+function code(id){
+   $("html, body").animate({ scrollTop: $('#' + id).offset().top }, 1000);
+   $('#' + id).html('<div class="card-body"><form id = "idMessage" method = "POST" action = "text">@csrf<div class="form-group row"><input name = "id" type = "text" value = "' + id + '" style="display: none"><label for="attach" class="col-md-4 col-form-label text-md-right">Attach file</label><div class="col-md-6"><input id = "attach" type="file" name="attach"></div></div><div class="form-group row"><label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label><div class="col-md-6"><input id="email" type="email" placeholder = "Email" name="email" required autocomplete="email">@error("email")<span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>@enderror</div></div><div class="form-group row"><label for="text" class="col-md-4 col-form-label text-md-right">Сообщение</label><div class="col-md-6"><textarea id="text" class = "form-control" name="text" rows = "5" cols = "100" placeholder = "Сообщение"></textarea></div></div><div class="form-group row mb-0"><div class="col-md-6 offset-md-4"><button type="submit" class="btn btn-primary">Отправить</button></div></div></form></div>');
+}
 </script>
 </body>
 </html>
